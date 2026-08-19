@@ -1,0 +1,97 @@
+{
+  "model_name": "SVR (RBF)",
+  "features": [
+    "Battery Age",
+    "Daily Usage Hours",
+    "Gaming User",
+    "Design Capacity",
+    "Cycle Count",
+    "CPU Usage",
+    "GPU Usage",
+    "Power Consumption",
+    "Average Temperature",
+    "Full Charge Capacity"
+  ],
+  "target": "Battery Health",
+  "metrics": {
+    "mae": 1.363642119164276,
+    "rmse": 1.6934938942598428,
+    "r2": 0.9696911633654508
+  },
+  "feature_stats": {
+    "Battery Age": {
+      "min": 0.0,
+      "max": 9.0,
+      "mean": 4.571666666666666,
+      "median": 5.0
+    },
+    "Daily Usage Hours": {
+      "min": 1.002497420400811,
+      "max": 11.9867222939722,
+      "mean": 6.43507813125098,
+      "median": 6.322145172987273
+    },
+    "Gaming User": {
+      "min": 0.0,
+      "max": 1.0,
+      "mean": 0.1025,
+      "median": 0.0
+    },
+    "Design Capacity": {
+      "min": 45002.0,
+      "max": 79959.0,
+      "mean": 62049.91916666667,
+      "median": 61888.0
+    },
+    "Cycle Count": {
+      "min": 0.0,
+      "max": 1500.0,
+      "mean": 993.8133333333334,
+      "median": 1188.0
+    },
+    "CPU Usage": {
+      "min": 9.151883868433512,
+      "max": 100.0,
+      "mean": 50.04702105608442,
+      "median": 50.097710960166935
+    },
+    "GPU Usage": {
+      "min": 5.0,
+      "max": 98.3399323741946,
+      "mean": 37.08195361520536,
+      "median": 34.979134494269395
+    },
+    "Power Consumption": {
+      "min": 20.133013009240614,
+      "max": 137.1549364968688,
+      "mean": 68.51000518543164,
+      "median": 67.39933591685889
+    },
+    "Average Temperature": {
+      "min": 22.90885748672788,
+      "max": 39.934239139414125,
+      "mean": 30.48373133882711,
+      "median": 30.398357041628145
+    },
+    "Full Charge Capacity": {
+      "min": 28181.020458574727,
+      "max": 79263.0,
+      "mean": 51798.12594357623,
+      "median": 51698.379657746715
+    }
+  },
+  "feature_importance": {
+    "Battery Age": 0.012653787842265047,
+    "Daily Usage Hours": 0.0035093139368713774,
+    "Gaming User": 0.0001412522361297384,
+    "Design Capacity": 0.004947537890717824,
+    "Cycle Count": 0.8269833132295388,
+    "CPU Usage": 0.002345301646491059,
+    "GPU Usage": 0.0026730571773914634,
+    "Power Consumption": 0.0025833798351322028,
+    "Average Temperature": 0.003567227621845127,
+    "Full Charge Capacity": 0.14059582858361733
+  },
+  "n_train": 960,
+  "n_test": 240
+}
