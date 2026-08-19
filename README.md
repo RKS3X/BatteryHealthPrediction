@@ -1,35 +1,42 @@
-# Battery Health Predictor — Streamlit App
+# Battery Health Predictor — Streamlit App (Light Blue/White Theme, ครบ 4 หัวข้อ)
 
-ทำนายสุขภาพแบตเตอรี่ Laptop (%) ด้วยโมเดล SVR (RBF Kernel) — R² = 0.970
+## ไฟล์ในโปรเจกต์นี้ (ต้องอัปทั้งหมดขึ้น GitHub รวมโฟลเดอร์ย่อย)
+```
+battery-streamlit-app-light/
+├── app.py
+├── requirements.txt
+├── model.pkl
+├── scaler.pkl
+├── model_meta.json
+├── .streamlit/
+│   └── config.toml
+└── assets/
+    ├── profile.jpg
+    ├── chart_r2.png
+    ├── chart_rmse.png
+    ├── chart_actual_vs_pred.png
+    ├── chart_feature_importance.png
+    └── chart_correlation.png
+```
 
-## ไฟล์ในโปรเจกต์นี้
-| ไฟล์ | หน้าที่ |
-|---|---|
-| `app.py` | โค้ดแอป Streamlit หลัก |
-| `model.pkl` | โมเดล SVR ที่เทรนไว้แล้ว (joblib) |
-| `scaler.pkl` | StandardScaler ที่ fit จากชุด Train (ต้องใช้คู่กับโมเดลเสมอ) |
-| `model_meta.json` | ชื่อฟีเจอร์ ค่าตัวชี้วัด (MAE/RMSE/R²) และสถิติของแต่ละฟีเจอร์ |
-| `requirements.txt` | ไลบรารีที่ต้องติดตั้งบน Streamlit Cloud |
-| `.streamlit/config.toml` | ธีมสีเข้ม (dark) ให้ตรงกับพอร์ตโฟลิโอหลัก |
+## สิ่งที่เพิ่มจากเวอร์ชันก่อนหน้า
+- **โปรไฟล์ผู้พัฒนา** ด้านบนสุดของแอป (รูปจริง + นายรติพงษ์ ครองระวะ + รหัสนักศึกษา 664245045 + หมู่เรียน 66/44)
+- **ธีมสีฟ้า-ขาว** (เปลี่ยนจากธีมมืดเดิม) ทั้งใน `.streamlit/config.toml` และกราฟทุกภาพ
+- แอปแบ่งเป็น 5 แท็บ:
+  1. 🔮 ทำนายผล — ตัวทำนายเดิม
+  2. 📁 01 · Dataset — โจทย์ปัญหาและเหตุผลที่เลือก dataset นี้ + ตารางฟีเจอร์
+  3. 🧹 02 · Preprocessing — ขั้นตอนเตรียมข้อมูลทั้ง 5 ขั้น
+  4. 🧠 03 · ทฤษฎีโมเดล — อธิบายหลักการของ 5 โมเดลที่เปรียบเทียบ
+  5. 📊 04 · ผลการประเมิน — ตารางเปรียบเทียบ + กราฟ 5 ภาพ (R², RMSE, Actual vs Predicted, Feature Importance, Correlation Heatmap)
 
-## วิธี Deploy บน Streamlit Community Cloud (ฟรี)
+## วิธี Deploy บน Streamlit Community Cloud
+1. อัปโหลดทุกไฟล์/โฟลเดอร์ข้างต้นขึ้น GitHub repo (ตั้งเป็น Public) — **ต้องคงโครงสร้างโฟลเดอร์ `assets/` และ `.streamlit/` ไว้เหมือนเดิม**
+2. ไปที่ https://share.streamlit.io → New app → เลือก repo/branch
+3. Main file path ใส่ `app.py`
+4. กด Deploy
 
-1. สร้าง repo ใหม่บน GitHub (เช่น `battery-health-app`) แล้วอัปโหลดไฟล์ทั้งหมดในโฟลเดอร์นี้
-   (ต้องอัปทั้ง `model.pkl`, `scaler.pkl`, `model_meta.json` ไปด้วย — ไม่ใช่แค่ `app.py`)
-2. ตั้งค่า repo เป็น **Public**
-3. ไปที่ https://share.streamlit.io แล้วเข้าสู่ระบบด้วย GitHub
-4. กด **New app** → เลือก repo / branch ที่อัปโหลดไว้
-5. ที่ช่อง **Main file path** ใส่ `app.py`
-6. กด **Deploy** — รอสักครู่จะได้ลิงก์รูปแบบ `https://<ชื่อแอป>.streamlit.app`
-
-## รันทดสอบในเครื่องตัวเอง (ถ้าต้องการ)
+## รันทดสอบในเครื่อง
 ```bash
 pip install -r requirements.txt
 streamlit run app.py
 ```
-
-## หมายเหตุ
-- โมเดลนี้เทรนจากไฟล์ `battery_health_dataset.csv` (1,200 แถว) ที่ใช้ในหน้ารายงานโปรเจกต์
-  (`battery-health.html`) — ตัวเลข R²/MAE/RMSE ในแอปตรงกับหน้ารายงานนั้น
-- ถ้าต้องการเปลี่ยนโมเดลเป็น Random Forest แทน SVR สามารถแก้ไฟล์ `save_model.py`
-  (สคริปต์เทรน ไม่ได้รวมมาในโฟลเดอร์นี้ แจ้งได้ถ้าต้องการ) ให้ dump `rf` แทน `svr` แล้วรันใหม่
