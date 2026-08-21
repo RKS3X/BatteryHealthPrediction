@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ทำนายสุขภาพแบตเตอรี่ Laptop | รติพงษ์ ครองระวะ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700&family=IBM+Plex+Sans+Thai:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="nav">
+  <div class="wrap">
+    <a class="nav-back" href="index.html">&larr; กลับหน้าผลงานหลัก</a>
+    <span class="nav-tag">ML PROJECT · REGRESSION</span>
+  </div>
+</div>
+
+<!-- PROFILE -->
+<header class="profile wrap">
+  <div class="profile-photo">
+    <img src="assets/profile.jpg" alt="รูปนักศึกษาผู้พัฒนา">
+  </div>
+  <div>
+    <p class="profile-eyebrow">Machine Learning Project — Battery Health Prediction</p>
+    <h1 class="profile-title">ทำนายสุขภาพแบตเตอรี่ Laptop ด้วย Machine Learning</h1>
+    <div class="profile-meta">
+      <span><b>ผู้พัฒนา:</b> นายรติพงษ์ ครองระวะ</span>
+      <span><b>รหัสนักศึกษา:</b> 664245045</span>
+      <span><b>หมู่เรียน:</b> <span class="placeholder">[ระบุหมู่เรียน]</span></span>
+    </div>
+  </div>
+</header>
+
+<!-- 01 PROBLEM & DATASET -->
+<section class="section wrap">
+  <div class="section-head">
+    <span class="section-num">01</span>
+    <div>
+      <div class="section-title">การกำหนดปัญหาและ Dataset</div>
+      <div class="section-sub">Problem Definition &amp; Dataset</div>
+    </div>
+  </div>
+
+  <p>
+    แบตเตอรี่ของ Laptop เสื่อมสภาพลงตามการใช้งาน แต่ผู้ใช้ทั่วไปมักไม่รู้ว่าแบตเตอรี่ของตัวเอง
+    เหลือ "สุขภาพ" (Battery Health) อยู่กี่เปอร์เซ็นต์ จนกว่าจะสังเกตได้ว่าใช้งานได้สั้นลงอย่างชัดเจน
+    โปรเจกต์นี้จึงตั้งโจทย์เป็นปัญหา <b>Regression</b> คือ ทำนายค่า Battery Health (%) ซึ่งเป็นตัวเลขต่อเนื่อง
+    จากพฤติกรรมการใช้งานและค่าที่วัดได้จากฮาร์ดแวร์ เพื่อให้ผู้ใช้ประเมินสภาพแบตเตอรี่ล่วงหน้าได้
+    โดยไม่ต้องรอให้เครื่องมือวัดแบตเตอรี่แจ้งเตือน
+  </p>
+
+  <p>
+    เหตุผลที่เลือกใช้ Dataset ชุดนี้: (1) เป็นปัญหาที่ใกล้ตัวและนำไปใช้ได้จริง เจ้าของเครื่องทุกคนอยากรู้ว่า
+    แบตเตอรี่ของตัวเองเหลือสภาพเท่าไร (2) ข้อมูลเป็นตัวเลขล้วน ไม่มีค่าว่าง เหมาะสำหรับฝึกเทียบโมเดล
+    Regression หลายแบบในเวลาจำกัด (3) ฟีเจอร์ในชุดข้อมูลผสมทั้งด้าน<b>พฤติกรรมผู้ใช้</b> (ชั่วโมงใช้งาน, เล่นเกมหรือไม่)
+    และ<b>ค่าฮาร์ดแวร์/การสึกหรอ</b> (จำนวนรอบชาร์จ, อุณหภูมิ, ความจุที่ชาร์จได้จริง) ทำให้เห็นภาพว่าปัจจัยใดมีผลต่อ
+    สุขภาพแบตเตอรี่มากที่สุดผ่านขั้นตอน Feature Importance ในหัวข้อถัดไป
+  </p>
+
+  <div class="stat-row">
+    <div class="stat"><b>1,200</b><span>แถวข้อมูล (Laptop)</span></div>
+    <div class="stat"><b>10</b><span>ฟีเจอร์นำเข้า (Input Features)</span></div>
+    <div class="stat"><b>1</b><span>ตัวแปรเป้าหมาย — Battery Health (%)</span></div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>ฟีเจอร์</th><th>ความหมาย</th><th>ช่วงค่าในข้อมูล</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Battery Age</td><td>อายุแบตเตอรี่ (ปี)</td><td class="num">0 – 9</td></tr>
+        <tr><td>Daily Usage Hours</td><td>ชั่วโมงใช้งานเฉลี่ยต่อวัน</td><td class="num">1.0 – 12.0</td></tr>
+        <tr><td>Gaming User</td><td>เป็นผู้ใช้สายเกม (0/1)</td><td class="num">0, 1</td></tr>
+        <tr><td>Design Capacity</td><td>ความจุตามสเปกโรงงาน (mAh)</td><td class="num">45,002 – 79,959</td></tr>
+        <tr><td>Cycle Count</td><td>จำนวนรอบชาร์จสะสม</td><td class="num">0 – 1,500</td></tr>
+        <tr><td>CPU Usage</td><td>เปอร์เซ็นต์การใช้งาน CPU เฉลี่ย</td><td class="num">9.2 – 100</td></tr>
+        <tr><td>GPU Usage</td><td>เปอร์เซ็นต์การใช้งาน GPU เฉลี่ย</td><td class="num">5.0 – 98.3</td></tr>
+        <tr><td>Power Consumption</td><td>กำลังไฟที่ใช้ (วัตต์)</td><td class="num">20.1 – 137.2</td></tr>
+        <tr><td>Average Temperature</td><td>อุณหภูมิเฉลี่ยขณะใช้งาน (°C)</td><td class="num">22.9 – 39.9</td></tr>
+        <tr><td>Full Charge Capacity</td><td>ความจุจริงที่ชาร์จได้เต็ม (mAh)</td><td class="num">28,181 – 79,263</td></tr>
+        <tr><td><b>Battery Health</b> (target)</td><td>สุขภาพแบตเตอรี่ปัจจุบัน (%)</td><td class="num">59.8 – 100</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 02 PREPROCESSING -->
+<section class="section wrap">
+  <div class="section-head">
+    <span class="section-num">02</span>
+    <div>
+      <div class="section-title">Data Preprocessing</div>
+      <div class="section-sub">การเตรียมข้อมูลก่อนสร้างโมเดล</div>
+    </div>
+  </div>
+
+  <p>ก่อนนำข้อมูลไปเทรนโมเดล ได้ตรวจสอบและเตรียมข้อมูลตามขั้นตอนต่อไปนี้:</p>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-num"></div>
+      <div class="step-body">
+        <h4>ตรวจสอบค่าว่าง (Missing Values)</h4>
+        <p>ตรวจด้วย <code>df.isnull().sum()</code> พบว่าทั้ง 11 คอลัมน์ไม่มีค่าว่างเลยสักแถว จึงไม่ต้องทำ Imputation เพิ่มเติม</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num"></div>
+      <div class="step-body">
+        <h4>ตรวจสอบข้อมูลซ้ำ (Duplicates)</h4>
+        <p>ตรวจด้วย <code>df.duplicated().sum()</code> ผลลัพธ์เท่ากับ 0 แถว จึงไม่ต้องลบข้อมูลซ้ำออก</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num"></div>
+      <div class="step-body">
+        <h4>ตรวจสอบค่าผิดปกติ (Outliers) ด้วยหลัก IQR</h4>
+        <p>พบค่าที่หลุดกรอบ IQR เล็กน้อยใน GPU Usage, Power Consumption และ Average Temperature
+        แต่เมื่อตรวจดูค่าจริงแล้วยังอยู่ในช่วงที่เป็นไปได้ของการใช้งานเครื่องจริง (เช่น เล่นเกม/เรนเดอร์วิดีโอหนัก ๆ)
+        จึงตัดสินใจ<b>เก็บข้อมูลไว้ทั้งหมด</b> ไม่ลบทิ้ง เพื่อไม่ให้โมเดลเสียสัญญาณของการใช้งานหนักไป</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num"></div>
+      <div class="step-body">
+        <h4>แบ่งข้อมูล Train / Test</h4>
+        <p>แบ่งข้อมูลด้วย <code>train_test_split</code> อัตราส่วน 80:20 (เทรน 960 แถว / ทดสอบ 240 แถว)
+        กำหนด <code>random_state=42</code> เพื่อให้ผลลัพธ์ทำซ้ำได้</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num"></div>
+      <div class="step-body">
+        <h4>ปรับสเกลข้อมูล (Feature Scaling)</h4>
+        <p>ใช้ <code>StandardScaler</code> แปลงทุกฟีเจอร์ให้มีค่าเฉลี่ย 0 และส่วนเบี่ยงเบนมาตรฐาน 1
+        โดย fit จากชุด Train เท่านั้นแล้วนำไป transform ชุด Test ขั้นตอนนี้จำเป็นมากสำหรับโมเดลที่วัดระยะทาง
+        อย่าง KNN เพราะฟีเจอร์ในข้อมูลมีหน่วยต่างกันมาก (เช่น mAh หลักหมื่น เทียบกับเปอร์เซ็นต์การใช้งาน 0–100)</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 03 MODEL THEORY -->
+<section class="section wrap">
+  <div class="section-head">
+    <span class="section-num">03</span>
+    <div>
+      <div class="section-title">การสร้างโมเดล ML</div>
+      <div class="section-sub">อธิบายทฤษฎีของแต่ละโมเดลที่นำมาเปรียบเทียบ</div>
+    </div>
+  </div>
+
+  <p>
+    เพื่อหาว่าอัลกอริทึมใดเหมาะกับการทำนาย Battery Health มากที่สุด จึงเทรนโมเดล Regression 4 แบบ
+    บนข้อมูลชุดเดียวกัน แล้วเปรียบเทียบผลในหัวข้อถัดไป
+  </p>
+
+  <div class="model-list">
+    <div class="model-item">
+      <div class="model-item-head">
+        <h4>Linear Regression</h4>
+        <span class="model-tag">BASELINE</span>
+      </div>
+      <p>หาสมการเส้นตรงในรูป <code>y = w₁x₁ + w₂x₂ + ... + wₙxₙ + b</code> ที่ทำให้ผลรวมของ
+      ค่าความคลาดเคลื่อนกำลังสอง (Sum of Squared Errors) ระหว่างค่าจริงกับค่าทำนายน้อยที่สุด (Ordinary Least Squares)
+      ข้อดีคือตีความง่ายว่าฟีเจอร์ใดมีน้ำหนัก (weight) มาก แต่จะทำนายได้แม่นก็ต่อเมื่อความสัมพันธ์ระหว่างฟีเจอร์กับ
+      เป้าหมายเป็นเส้นตรงจริง ๆ ใช้เป็นตัวเทียบมาตรฐาน (baseline) ของโปรเจกต์นี้</p>
+    </div>
+
+    <div class="model-item">
+      <div class="model-item-head">
+        <h4>K-Nearest Neighbors (KNN) Regressor</h4>
+        <span class="model-tag">INSTANCE-BASED</span>
+      </div>
+      <p>ไม่มีขั้นตอน "เทรน" สมการใด ๆ แต่เก็บข้อมูลทั้งหมดไว้ เมื่อต้องทำนายค่าของแล็ปท็อปเครื่องใหม่
+      โมเดลจะคำนวณระยะห่าง (Euclidean Distance) ไปยังข้อมูลทุกแถวในชุด Train แล้วเลือก k เพื่อนบ้านที่ใกล้ที่สุด
+      (โปรเจกต์นี้ตั้ง k = 7) จากนั้นทำนายค่าด้วย<b>ค่าเฉลี่ย</b>ของ Battery Health ของเพื่อนบ้านทั้ง 7 เครื่องนั้น
+      เพราะอิงระยะทางโดยตรง จึง<b>ไวต่อสเกลของฟีเจอร์มาก</b> — เป็นเหตุผลหลักที่ต้องทำ Feature Scaling ก่อน</p>
+    </div>
+
+    <div class="model-item">
+      <div class="model-item-head">
+        <h4>Decision Tree Regressor</h4>
+        <span class="model-tag">TREE-BASED</span>
+      </div>
+      <p>แบ่งข้อมูลออกเป็นกิ่ง ๆ ทีละขั้นด้วยเงื่อนไข if/else บนฟีเจอร์ตัวใดตัวหนึ่ง (เช่น "Cycle Count &gt; 800 หรือไม่")
+      โดยเลือกจุดแบ่งที่ลดค่าความแปรปรวน (Variance / MSE) ของ Battery Health ในแต่ละกิ่งให้มากที่สุด
+      ทำซ้ำจนถึงใบ (leaf) แล้วทำนายด้วยค่าเฉลี่ยของข้อมูลในใบนั้น อ่านผลลัพธ์เป็นเงื่อนไขที่มนุษย์เข้าใจได้ง่าย
+      แต่ถ้าปล่อยให้ต้นไม้ลึกเกินไปจะจำข้อมูล Train มากเกินไป (Overfitting) จึงจำกัดความลึกไว้ที่ 6 ระดับ</p>
+    </div>
+
+    <div class="model-item">
+      <div class="model-item-head">
+        <h4>Random Forest Regressor</h4>
+        <span class="model-tag">ENSEMBLE · ตัวที่ใช้จริงในแอป</span>
+      </div>
+      <p>สร้าง Decision Tree จำนวนมาก (โปรเจกต์นี้ใช้ 300 ต้น) โดยแต่ละต้นเทรนจากข้อมูลที่สุ่มเลือกแบบใส่คืน
+      (Bootstrap Sampling) และสุ่มเลือกฟีเจอร์บางส่วนในแต่ละจุดแบ่ง แล้วนำค่าที่แต่ละต้นทำนายมา<b>เฉลี่ยรวมกัน</b>
+      เป็นคำตอบสุดท้าย หลักการนี้ช่วยลดความแปรปรวน (Variance) และ Overfitting ที่มักเกิดกับ Decision Tree
+      ต้นเดียว ทำให้แม่นยำและมีเสถียรภาพมากขึ้น จากการเปรียบเทียบทั้ง 4 โมเดล Random Forest ให้ผล R² สูงที่สุด
+      จึงเลือกนำมาใช้เป็นโมเดลจริงในเว็บแอป Streamlit</p>
+    </div>
+  </div>
+</section>
+
+<!-- 04 EVALUATION -->
+<section class="section wrap">
+  <div class="section-head">
+    <span class="section-num">04</span>
+    <div>
+      <div class="section-title">การประเมินและเปรียบเทียบโมเดล</div>
+      <div class="section-sub">Model Evaluation &amp; Comparison</div>
+    </div>
+  </div>
+
+  <p>
+    ประเมินโมเดลทั้ง 4 แบบด้วยชุด Test (240 แถว) โดยใช้ 3 ตัวชี้วัดหลัก:
+    <b>MAE</b> (ค่าคลาดเคลื่อนเฉลี่ยสัมบูรณ์ ยิ่งน้อยยิ่งดี), <b>RMSE</b> (ค่าคลาดเคลื่อนกำลังสองเฉลี่ยแบบถอดราก
+    ยิ่งน้อยยิ่งดี และลงโทษข้อผิดพลาดก้อนใหญ่หนักกว่า) และ <b>R² Score</b> (สัดส่วนความแปรปรวนของ Battery Health
+    ที่โมเดลอธิบายได้ ยิ่งใกล้ 1 ยิ่งดี)
+  </p>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>โมเดล</th><th>MAE</th><th>RMSE</th><th>R² Score</th></tr>
+      </thead>
+      <tbody>
+        <tr class="best">
+          <td>Random Forest <span class="badge-best">ดีที่สุด</span></td>
+          <td class="num">1.38</td><td class="num">1.72</td><td class="num">0.969</td>
+        </tr>
+        <tr><td>Decision Tree</td><td class="num">1.69</td><td class="num">2.14</td><td class="num">0.952</td></tr>
+        <tr><td>KNN Regressor</td><td class="num">1.72</td><td class="num">2.15</td><td class="num">0.951</td></tr>
+        <tr><td>Linear Regression</td><td class="num">1.79</td><td class="num">2.26</td><td class="num">0.946</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="chart-grid">
+    <figure class="chart-figure">
+      <img src="assets/chart_r2.png" alt="กราฟเปรียบเทียบ R2 Score ของแต่ละโมเดล">
+      <figcaption class="chart-cap">R² Score ของแต่ละโมเดล — ยิ่งแท่งยาวใกล้ 1 ยิ่งอธิบายความแปรปรวนของ Battery Health ได้ดี</figcaption>
+    </figure>
+    <figure class="chart-figure">
+      <img src="assets/chart_rmse.png" alt="กราฟเปรียบเทียบ RMSE ของแต่ละโมเดล">
+      <figcaption class="chart-cap">RMSE ของแต่ละโมเดล — ยิ่งแท่งสั้นยิ่งคลาดเคลื่อนน้อย</figcaption>
+    </figure>
+  </div>
+
+  <div class="chart-grid">
+    <figure class="chart-figure">
+      <img src="assets/chart_actual_vs_pred.png" alt="กราฟ Actual vs Predicted ของโมเดลที่ดีที่สุด">
+      <figcaption class="chart-cap">ค่าจริงเทียบค่าที่ทำนายจากโมเดล Random Forest — จุดยิ่งอยู่ใกล้เส้นประยิ่งทำนายแม่น</figcaption>
+    </figure>
+    <figure class="chart-figure">
+      <img src="assets/chart_feature_importance.png" alt="กราฟ Feature Importance จาก Random Forest">
+      <figcaption class="chart-cap">ฟีเจอร์ที่ Random Forest ให้น้ำหนักมากที่สุดในการทำนาย Battery Health</figcaption>
+    </figure>
+  </div>
+
+  <figure class="chart-figure">
+    <img src="assets/chart_correlation.png" alt="Correlation Heatmap ของทุกฟีเจอร์ในชุดข้อมูล">
+    <figcaption class="chart-cap">ความสัมพันธ์เชิงเส้นระหว่างฟีเจอร์ทั้งหมดกับ Battery Health</figcaption>
+  </figure>
+
+  <div class="insight-box">
+    <p>
+      <b>สรุปผล:</b> Random Forest ให้ผลแม่นยำที่สุดในบรรดา 4 โมเดลที่เปรียบเทียบ (R² = 0.969) ทำผลได้ดีกว่า
+      Decision Tree, KNN Regressor และ Linear Regression อย่างชัดเจน เพราะเป็นโมเดลแบบ Ensemble ที่รวมผลจาก
+      หลายต้นไม้ตัดสินใจเข้าด้วยกัน จึงลด Overfitting และมีเสถียรภาพมากกว่าโมเดลเดี่ยว ๆ จากกราฟ Feature Importance
+      พบว่า <b>Cycle Count</b> (จำนวนรอบชาร์จ) และ <b>Full Charge Capacity</b> (ความจุที่ชาร์จได้จริง)
+      เป็นสองปัจจัยที่มีผลต่อการทำนายมากที่สุดอย่างชัดเจน ซึ่งสอดคล้องกับหลักการเสื่อมสภาพแบตเตอรี่ในโลกจริง
+      จึงเลือกใช้ Random Forest เป็นโมเดลจริงในเว็บแอป Streamlit ด้านล่างนี้
+    </p>
+  </div>
+</section>
+
+<!-- 05 STREAMLIT APP -->
+<section class="section wrap" style="border-bottom:none;">
+  <div class="section-head">
+    <span class="section-num">05</span>
+    <div>
+      <div class="section-title">Streamlit Application</div>
+      <div class="section-sub">เว็บแอปสำหรับทดลองใช้งานโมเดลจริง</div>
+    </div>
+  </div>
+
+  <p>
+    โมเดลที่ดีที่สุดจากการเปรียบเทียบถูกนำไป deploy เป็นเว็บแอปด้วย Streamlit ให้ผู้ใช้กรอกค่าการใช้งาน
+    แล็ปท็อปของตัวเอง แล้วรับค่าทำนายสุขภาพแบตเตอรี่ได้ทันทีแบบ interactive
+  </p>
+
+  <div class="app-panel">
+    <div class="app-panel-text">
+      <h4>Battery Health Predictor</h4>
+      <p>ผู้ใช้ปรับค่าฟีเจอร์ต่าง ๆ ผ่าน slider/input บนหน้าเว็บ เช่น:</p>
+      <ul>
+        <li>อายุแบตเตอรี่ (ปี) และจำนวนรอบชาร์จสะสม</li>
+        <li>ชั่วโมงใช้งานเฉลี่ยต่อวัน และพฤติกรรมการเล่นเกม</li>
+        <li>อุณหภูมิเฉลี่ยขณะใช้งาน และกำลังไฟที่ใช้</li>
+      </ul>
+      <p style="margin-top:12px;">แล้วแอปจะแสดงเปอร์เซ็นต์ Battery Health ที่โมเดลทำนายออกมาให้ทันที</p>
+    </div>
+    <div>
+      <a class="btn" href="https://regression-edpfswfritzitnat3kvu8z.streamlit.app/" target="_blank" rel="noopener noreferrer">เปิดใช้งาน Streamlit App →</a>
+      <p class="app-url">regression-edpfswfritzitnat3kvu8z.streamlit.app</p>
+    </div>
+  </div>
+</section>
+
+<footer class="footer wrap">
+  <p>นายรติพงษ์ ครองระวะ · รหัสนักศึกษา 664245045</p>
+  <p style="margin-top:6px;"><a href="index.html">&larr; กลับสู่หน้าผลงาน Machine Learning ทั้งหมด</a></p>
+</footer>
+
+</body>
+</html>

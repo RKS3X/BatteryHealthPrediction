@@ -1,5 +1,5 @@
 {
-  "model_name": "SVR (RBF)",
+  "model_name": "Random Forest",
   "features": [
     "Battery Age",
     "Daily Usage Hours",
@@ -14,9 +14,9 @@
   ],
   "target": "Battery Health",
   "metrics": {
-    "mae": 1.363642119164276,
-    "rmse": 1.6934938942598428,
-    "r2": 0.9696911633654508
+    "mae": 1.3828771488949012,
+    "rmse": 1.7248416596891072,
+    "r2": 0.968558702307107
   },
   "feature_stats": {
     "Battery Age": {
@@ -93,5 +93,31 @@
     "Full Charge Capacity": 0.14059582858361733
   },
   "n_train": 960,
-  "n_test": 240
+  "n_test": 240,
+  "all_models_compared": [
+    {
+      "model": "Random Forest",
+      "mae": 1.3828771488949012,
+      "rmse": 1.7248416596891072,
+      "r2": 0.968558702307107
+    },
+    {
+      "model": "Decision Tree",
+      "mae": 1.6892033786371219,
+      "rmse": 2.136628745165378,
+      "r2": 0.9517541313335395
+    },
+    {
+      "model": "KNN Regressor",
+      "mae": 1.7161233202479358,
+      "rmse": 2.1525020491161255,
+      "r2": 0.9510346183768765
+    },
+    {
+      "model": "Linear Regression",
+      "mae": 1.7880295635338845,
+      "rmse": 2.2633853466043585,
+      "r2": 0.9458599071443409
+    }
+  ]
 }
