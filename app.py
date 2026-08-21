@@ -167,6 +167,9 @@ with tab_predict:
             min_value=25000, max_value=85000, value=52000, step=500,
             help="ค่าความจุจริงที่วัดได้ล่าสุดตอนชาร์จเต็ม มักจะน้อยกว่า Design Capacity เมื่อแบตเตอรี่เสื่อม")
 
+        capacity_ratio = full_charge_capacity / design_capacity * 100
+        st.caption(f"→ ความจุคงเหลือเทียบกับตอนใหม่ (Capacity Ratio): **{capacity_ratio:.1f}%**")
+
         st.markdown("")
         predict_clicked = st.button("🔍 ทำนายสุขภาพแบตเตอรี่", use_container_width=True, type="primary")
         result_slot = st.container()
@@ -192,6 +195,7 @@ with tab_predict:
         "Power Consumption": power_consumption,
         "Average Temperature": avg_temp,
         "Full Charge Capacity": full_charge_capacity,
+        "Capacity Ratio": capacity_ratio,
     }])[FEATURES]
 
     with right:
@@ -222,9 +226,9 @@ with tab_predict:
         c2.metric("R² Score", f"{METRICS['r2']:.3f}")
         c3.metric("MAE", f"{METRICS['mae']:.2f} จุด")
         st.caption(
-            f"เทรนด้วยข้อมูล {meta['n_train']} แถว ทดสอบกับ {meta['n_test']} แถว · "
-            f"ฟีเจอร์ทุกตัวถูกปรับสเกลด้วย StandardScaler ก่อนป้อนเข้าโมเดล {meta['model_name']} "
-            "(300 ต้นไม้ตัดสินใจ, max depth 10)"
+            f"เทรนด้วยข้อมูล {meta['n_train']} แถว ทดสอบกับ {meta['n_test']} แถว จาก {len(FEATURES)} ฟีเจอร์ "
+            f"(รวม **Capacity Ratio** ที่คำนวณเพิ่มจาก Full Charge Capacity ÷ Design Capacity) · "
+            f"ฟีเจอร์ทุกตัวถูกปรับสเกลด้วย StandardScaler ก่อนป้อนเข้าโมเดล {meta['model_name']}"
         )
 
 # =================================================================
@@ -254,7 +258,7 @@ with tab_dataset:
     with c1:
         st.markdown('<div class="stat-box"><b>1,200</b><span>แถวข้อมูล (Laptop)</span></div>', unsafe_allow_html=True)
     with c2:
-        st.markdown('<div class="stat-box"><b>10</b><span>ฟีเจอร์นำเข้า</span></div>', unsafe_allow_html=True)
+        st.markdown('<div class="stat-box"><b>11</b><span>ฟีเจอร์นำเข้า</span></div>', unsafe_allow_html=True)
     with c3:
         st.markdown('<div class="stat-box"><b>1</b><span>เป้าหมาย — Battery Health (%)</span></div>', unsafe_allow_html=True)
 
@@ -270,9 +274,22 @@ with tab_dataset:
         ["Power Consumption", "กำลังไฟที่ใช้ (วัตต์)", "20.1 – 137.2"],
         ["Average Temperature", "อุณหภูมิเฉลี่ยขณะใช้งาน (°C)", "22.9 – 39.9"],
         ["Full Charge Capacity", "ความจุจริงที่ชาร์จได้เต็ม (mAh)", "28,181 – 79,263"],
+        ["Capacity Ratio (engineered)", "สัดส่วน Full Charge ÷ Design Capacity × 100 (%)", "60.7 – 100.0"],
         ["Battery Health (target)", "สุขภาพแบตเตอรี่ปัจจุบัน (%)", "59.8 – 100"],
     ], columns=["ฟีเจอร์", "ความหมาย", "ช่วงค่าในข้อมูล"])
     st.table(feature_table)
+
+    st.markdown("""
+<div class="info-card">
+<h4>Feature Engineering — Capacity Ratio</h4>
+ตอนแรกโมเดลป้อน <b>Design Capacity</b> และ <b>Full Charge Capacity</b> เป็นค่า mAh ดิบสองตัวแยกกัน
+ซึ่งพบว่าโมเดลแทบไม่ใช้ Design Capacity เลย (importance ~0.5%) และพึ่งพา Cycle Count เป็นหลัก
+ทำให้เวลาผู้ใช้กรอกความจุที่เสื่อมลงมาก ๆ ผลทำนายกลับขยับน้อยผิดปกติ — จึงเพิ่มฟีเจอร์คำนวณ
+<b>Capacity Ratio = Full Charge Capacity ÷ Design Capacity × 100</b> ซึ่งเป็นนิยามของ "สุขภาพแบตเตอรี่"
+โดยตรงอยู่แล้ว (สหสัมพันธ์กับ Battery Health สูงถึง 0.99) หลังเพิ่มฟีเจอร์นี้ โมเดลตอบสนองต่อค่าความจุที่กรอก
+ได้ถูกต้องและไวขึ้นมาก
+</div>
+    """, unsafe_allow_html=True)
 
 # =================================================================
 # TAB: PREPROCESSING
@@ -312,11 +329,13 @@ with tab_theory:
     )
 
     models_info = [
-        ("Linear Regression", "BASELINE",
+        ("Linear Regression", "BASELINE · ตัวที่ใช้จริงในแอปนี้",
          "หาสมการเส้นตรงในรูป `y = w₁x₁ + w₂x₂ + ... + wₙxₙ + b` ที่ทำให้ผลรวมของค่าความคลาดเคลื่อนกำลังสอง "
          "(Sum of Squared Errors) ระหว่างค่าจริงกับค่าทำนายน้อยที่สุด (Ordinary Least Squares) ข้อดีคือตีความง่าย "
          "ว่าฟีเจอร์ใดมีน้ำหนัก (weight) มาก แต่จะทำนายได้แม่นก็ต่อเมื่อความสัมพันธ์ระหว่างฟีเจอร์กับเป้าหมายเป็นเส้นตรงจริง ๆ "
-         "ใช้เป็นตัวเทียบมาตรฐาน (baseline) ของโปรเจกต์นี้"),
+         "เดิมใช้เป็นตัวเทียบมาตรฐาน (baseline) เท่านั้น แต่หลังเพิ่มฟีเจอร์ <b>Capacity Ratio</b> (ซึ่งมีความสัมพันธ์เชิงเส้น "
+         "เกือบสมบูรณ์กับ Battery Health) เข้าไป Linear Regression กลับให้ผล R² สูงที่สุดในบรรดา 4 โมเดล "
+         "จึงถูกเลือกมาใช้งานจริงในแอปนี้"),
         ("K-Nearest Neighbors (KNN) Regressor", "INSTANCE-BASED",
          "ไม่มีขั้นตอน “เทรน” สมการใด ๆ แต่เก็บข้อมูลทั้งหมดไว้ เมื่อต้องทำนายค่าของแล็ปท็อปเครื่องใหม่ โมเดลจะคำนวณ "
          "ระยะห่าง (Euclidean Distance) ไปยังข้อมูลทุกแถวในชุด Train แล้วเลือก k เพื่อนบ้านที่ใกล้ที่สุด (โปรเจกต์นี้ตั้ง k = 7) "
@@ -327,11 +346,11 @@ with tab_theory:
          "โดยเลือกจุดแบ่งที่ลดค่าความแปรปรวน (Variance / MSE) ของ Battery Health ในแต่ละกิ่งให้มากที่สุด ทำซ้ำจนถึงใบ (leaf) "
          "แล้วทำนายด้วยค่าเฉลี่ยของข้อมูลในใบนั้น อ่านผลลัพธ์เป็นเงื่อนไขที่มนุษย์เข้าใจได้ง่าย แต่ถ้าปล่อยให้ต้นไม้ลึกเกินไป "
          "จะจำข้อมูล Train มากเกินไป (Overfitting) จึงจำกัดความลึกไว้ที่ 6 ระดับ"),
-        ("Random Forest Regressor", "ENSEMBLE · ตัวที่ใช้จริงในแอปนี้",
+        ("Random Forest Regressor", "ENSEMBLE",
          "สร้าง Decision Tree จำนวนมาก (โปรเจกต์นี้ใช้ 300 ต้น) โดยแต่ละต้นเทรนจากข้อมูลที่สุ่มเลือกแบบใส่คืน "
          "(Bootstrap Sampling) และสุ่มเลือกฟีเจอร์บางส่วนในแต่ละจุดแบ่ง แล้วนำค่าที่แต่ละต้นทำนายมา<b>เฉลี่ยรวมกัน</b>เป็นคำตอบสุดท้าย "
          "หลักการนี้ช่วยลดความแปรปรวน (Variance) และ Overfitting ที่มักเกิดกับ Decision Tree ต้นเดียว ทำให้แม่นยำและมีเสถียรภาพมากขึ้น "
-         "จากการเปรียบเทียบทั้ง 4 โมเดล Random Forest ให้ผล R² สูงที่สุด จึงเลือกนำมาใช้เป็นโมเดลจริงในแอปนี้"),
+         "ให้ผล R² สูงเป็นอันดับ 2 รองจาก Linear Regression ในการเปรียบเทียบล่าสุด (หลังเพิ่มฟีเจอร์ Capacity Ratio)"),
     ]
     for name, tag, body in models_info:
         st.markdown(
@@ -350,11 +369,10 @@ with tab_eval:
         "และ **R² Score** (สัดส่วนความแปรปรวนของ Battery Health ที่โมเดลอธิบายได้ ยิ่งใกล้ 1 ยิ่งดี)"
     )
 
+    _rows = sorted(meta["all_models_compared"], key=lambda r: r["r2"], reverse=True)
     comparison = pd.DataFrame([
-        ["Random Forest  ★ ดีที่สุด", 1.38, 1.72, 0.969],
-        ["Decision Tree", 1.69, 2.14, 0.952],
-        ["KNN Regressor", 1.72, 2.15, 0.951],
-        ["Linear Regression", 1.79, 2.26, 0.946],
+        [f"{r['model']}  ★ ดีที่สุด" if i == 0 else r["model"], r["mae"], r["rmse"], r["r2"]]
+        for i, r in enumerate(_rows)
     ], columns=["โมเดล", "MAE", "RMSE", "R² Score"])
     st.table(comparison.set_index("โมเดล"))
 
@@ -366,22 +384,24 @@ with tab_eval:
 
     g3, g4 = st.columns(2)
     with g3:
-        st.image("assets/chart_actual_vs_pred.png", caption="ค่าจริงเทียบค่าที่ทำนายจากโมเดล Random Forest", use_container_width=True)
+        st.image("assets/chart_actual_vs_pred.png", caption=f"ค่าจริงเทียบค่าที่ทำนายจากโมเดล {meta['model_name']}", use_container_width=True)
     with g4:
-        st.image("assets/chart_feature_importance.png", caption="ฟีเจอร์ที่มีผลต่อการทำนายมากที่สุด (Random Forest)", use_container_width=True)
+        st.image("assets/chart_feature_importance.png", caption=f"ฟีเจอร์ที่มีผลต่อการทำนายมากที่สุด ({meta['model_name']})", use_container_width=True)
 
     st.image("assets/chart_correlation.png", caption="ความสัมพันธ์เชิงเส้นระหว่างฟีเจอร์ทั้งหมดกับ Battery Health", use_container_width=True)
 
     st.markdown(
-        """
+        f"""
         <div class="info-card">
         <h4>สรุปผล</h4>
-        Random Forest ให้ผลแม่นยำที่สุดในบรรดา 4 โมเดลที่เปรียบเทียบ (R² = 0.969) ทำผลได้ดีกว่า Decision Tree,
-        KNN และ Linear Regression อย่างชัดเจน เพราะเป็นโมเดลแบบ Ensemble ที่รวมผลจากหลายต้นไม้ตัดสินใจเข้าด้วยกัน
-        จึงลด Overfitting และมีเสถียรภาพมากกว่าโมเดลเดี่ยว ๆ จากกราฟ Feature Importance พบว่า
-        <b>Cycle Count</b> (จำนวนรอบชาร์จ) และ <b>Full Charge Capacity</b> (ความจุที่ชาร์จได้จริง)
-        เป็นสองปัจจัยที่มีผลต่อการทำนายมากที่สุดอย่างชัดเจน ซึ่งสอดคล้องกับหลักการเสื่อมสภาพแบตเตอรี่ในโลกจริง
-        จึงเลือกใช้ Random Forest เป็นโมเดลจริงที่ทำงานอยู่เบื้องหลังแท็บ "ทำนายผล" ของแอปนี้
+        หลังเพิ่มฟีเจอร์ที่คำนวณเพิ่ม <b>Capacity Ratio</b> (Full Charge Capacity ÷ Design Capacity × 100)
+        เข้าไปในชุดฟีเจอร์ <b>{meta['model_name']}</b> กลับให้ผลแม่นยำที่สุดในบรรดา 4 โมเดลที่เปรียบเทียบ
+        (R² = {METRICS['r2']:.3f}) แซงหน้า Random Forest ที่เคยดีที่สุดตอนยังไม่มีฟีเจอร์นี้ เหตุผลคือ Capacity Ratio
+        มีความสัมพันธ์เชิงเส้นตรงเกือบสมบูรณ์กับ Battery Health (สหสัมพันธ์ ~0.99) โมเดลเชิงเส้นจึงจับรูปแบบนี้ได้ดีเป็นพิเศษ
+        จากกราฟ Feature Importance พบว่า <b>Capacity Ratio</b> เพียงตัวเดียวมีผลต่อการทำนายมากกว่าฟีเจอร์อื่นทั้งหมดรวมกัน
+        ซึ่งสอดคล้องกับนิยามของสุขภาพแบตเตอรี่ในโลกจริง (เช่นค่าที่ Windows Battery Report คำนวณ) —
+        บทเรียนสำคัญคือ <b>Feature Engineering ที่ตรงจุดมีผลต่อความแม่นยำมากกว่าความซับซ้อนของโมเดล</b>
+        จึงเลือกใช้ {meta['model_name']} เป็นโมเดลจริงที่ทำงานอยู่เบื้องหลังแท็บ "ทำนายผล" ของแอปนี้
         </div>
         """,
         unsafe_allow_html=True,

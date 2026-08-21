@@ -1,5 +1,5 @@
 {
-  "model_name": "Random Forest",
+  "model_name": "Linear Regression",
   "features": [
     "Battery Age",
     "Daily Usage Hours",
@@ -10,13 +10,14 @@
     "GPU Usage",
     "Power Consumption",
     "Average Temperature",
-    "Full Charge Capacity"
+    "Full Charge Capacity",
+    "Capacity Ratio"
   ],
   "target": "Battery Health",
   "metrics": {
-    "mae": 1.3828771488949012,
-    "rmse": 1.7248416596891072,
-    "r2": 0.968558702307107
+    "mae": 1.1294617396581204,
+    "rmse": 1.41732176757173,
+    "r2": 0.9787705417881054
   },
   "feature_stats": {
     "Battery Age": {
@@ -78,46 +79,53 @@
       "max": 79263.0,
       "mean": 51798.12594357623,
       "median": 51698.379657746715
+    },
+    "Capacity Ratio": {
+      "min": 60.72317968190378,
+      "max": 100.0,
+      "mean": 83.01118919099142,
+      "median": 81.44404188795977
     }
   },
   "feature_importance": {
-    "Battery Age": 0.012653787842265047,
-    "Daily Usage Hours": 0.0035093139368713774,
-    "Gaming User": 0.0001412522361297384,
-    "Design Capacity": 0.004947537890717824,
-    "Cycle Count": 0.8269833132295388,
-    "CPU Usage": 0.002345301646491059,
-    "GPU Usage": 0.0026730571773914634,
-    "Power Consumption": 0.0025833798351322028,
-    "Average Temperature": 0.003567227621845127,
-    "Full Charge Capacity": 0.14059582858361733
+    "Battery Age": 0.010959103590354282,
+    "Daily Usage Hours": 0.009144551544128398,
+    "Gaming User": 0.007370548483887815,
+    "Design Capacity": 0.04486840492151528,
+    "Cycle Count": 0.007285906920535612,
+    "CPU Usage": 0.03557403495952121,
+    "GPU Usage": 0.03097081880716496,
+    "Power Consumption": 0.005823436050935744,
+    "Average Temperature": 0.008027617796908146,
+    "Full Charge Capacity": 0.05150399540212794,
+    "Capacity Ratio": 0.7884715815229206
   },
   "n_train": 960,
   "n_test": 240,
   "all_models_compared": [
     {
+      "model": "Linear Regression",
+      "mae": 1.1294617396581204,
+      "rmse": 1.41732176757173,
+      "r2": 0.9787705417881054
+    },
+    {
       "model": "Random Forest",
-      "mae": 1.3828771488949012,
-      "rmse": 1.7248416596891072,
-      "r2": 0.968558702307107
+      "mae": 1.2556903768179504,
+      "rmse": 1.5878219406829723,
+      "r2": 0.9733556215242029
     },
     {
       "model": "Decision Tree",
-      "mae": 1.6892033786371219,
-      "rmse": 2.136628745165378,
-      "r2": 0.9517541313335395
+      "mae": 1.2777815473463254,
+      "rmse": 1.6490405945288604,
+      "r2": 0.9712614607140656
     },
     {
       "model": "KNN Regressor",
-      "mae": 1.7161233202479358,
-      "rmse": 2.1525020491161255,
-      "r2": 0.9510346183768765
-    },
-    {
-      "model": "Linear Regression",
-      "mae": 1.7880295635338845,
-      "rmse": 2.2633853466043585,
-      "r2": 0.9458599071443409
+      "mae": 1.5270534966053015,
+      "rmse": 1.864596650734442,
+      "r2": 0.9632572383028187
     }
   ]
 }
